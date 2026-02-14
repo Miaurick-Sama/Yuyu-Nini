@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Be My Valentine 💖</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body{
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #ff4d6d, #ff758f);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      color: white;
+      text-align: center;
+      overflow: hidden; /* évite les scrolls quand le bouton part loin */
+    }
+
+    .card{
+      position: relative;
+      background: rgba(0,0,0,0.2);
+      padding: 30px;
+      border-radius: 20px;
+      max-width: 320px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      backdrop-filter: blur(6px);
+    }
+
+    h1{ font-size: 26px; margin-bottom: 10px; }
+    p{ font-size: 16px; margin-bottom: 25px; }
+
+    .btn-row{
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    button{
+      font-size: 16px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #yes{ background: #2ecc71; color: white; }
+    #no{
+      background: #e74c3c;
+      color: white;
+      position: fixed; /* bouge dans tout l’écran, proprement */
+      left: 50%;
+      top: 65%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+    }
+
+    /* écran final */
+    .screen{
+      position: fixed;
+      inset: 0;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background: linear-gradient(135deg, #ff4d6d, #ff758f);
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .screen.show{ display: flex; }
+
+    /* petites animations de coeurs */
+    .heart{
+      position: fixed;
+      font-size: 20px;
+      pointer-events: none;
+      animation: floatUp 1.2s ease-out forwards;
+    }
+
+    @keyframes floatUp{
+      0%{ transform: translateY(0) scale(1); opacity: 1; }
+      100%{ transform: translateY(-120px) scale(1.4); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card" id="card">
+    <h1>Coucou Yuyu 💕</h1>
+    <p>
+      Répond moi avec ton cœur <br />
+      Tu veux être ma Valentine ? 🌹
+    </p>
+
+    <div class="btn-row">
+      <button id="yes" type="button">Oui 💖</button>
+    </div>
+  </div>
+
+  <button id="no" type="button">Non 😅</button>
+
+  <div class="screen" id="yay">
+    <h1>Youpiiiii 💘🎉</h1>
+    <p>je suis la personne la plus heureuse du monde ❤️🤍🥹</p>
+  </div>
+
+  <script>
+    const yesBtn = document.getElementById("yes");
+    const noBtn = document.getElementById("no");
+    const yay = document.getElementById("yay");
+    const card = document.getElementById("card");
+
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+
+    function moveNo(){
+      const rect = noBtn.getBoundingClientRect();
+      const pad = 12;
+
+      // zone de déplacement = viewport
+      const maxX = window.innerWidth - rect.width - pad;
+      const maxY = window.innerHeight - rect.height - pad;
+
+      const x = Math.random() * maxX;
+      const y = Math.random() * maxY;
+
+      noBtn.style.left = clamp(x, pad, maxX) + "px";
+      noBtn.style.top = clamp(y, pad, maxY) + "px";
+      noBtn.style.transform = "none";
+    }
+
+    function heartsBurst(){
+      for(let i=0;i<10;i++){
+        const h = document.createElement("div");
+        h.className = "heart";
+        h.textContent = "💖";
+        h.style.left = (window.innerWidth/2 + (Math.random()*120 - 60)) + "px";
+        h.style.top = (window.innerHeight/2 + (Math.random()*40 - 20)) + "px";
+        h.style.fontSize = (16 + Math.random()*18) + "px";
+        document.body.appendChild(h);
+        setTimeout(()=>h.remove(), 1200);
+      }
+    }
+
+    yesBtn.addEventListener("click", () => {
+      heartsBurst();
+      card.style.display = "none";
+      noBtn.style.display = "none";
+      yay.classList.add("show");
+    });
+
+    // PC (souris)
+    noBtn.addEventListener("mouseenter", moveNo);
+
+    // Mobile (tactile)
+    noBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      moveNo();
+    }, { passive: false });
+
+    // Bonus: si l'écran change de taille (rotation), on recadre
+    window.addEventListener("resize", () => {
+      // remet le bouton dans l'écran
+      const rect = noBtn.getBoundingClientRect();
+      if(rect.right > window.innerWidth || rect.bottom > window.innerHeight) moveNo();
+    });
+  </script>
+
+</body>
+</html>
